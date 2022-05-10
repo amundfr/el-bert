@@ -58,7 +58,7 @@ setup:
 	echo " Found conll-wikipedia-iob-annotations"; \
 	else \
 	echo " Generating Wikipedia annotated AIDA-CoNLL dataset"; \
-	python3 -m scripts.generate_conll_wikipedia_annotations --out_file /ex_data/annotated_datasets/conll-wikipedia-iob-annotations; \
+	python3 -m scripts.generate_conll_wikipedia_annotations /ex_data/annotated_datasets/conll-wikipedia-iob-annotations; \
 	fi; \
 	if [ -d "/ex_data/knowledgebases/wikipedia_score_15" ] && [ -f "/ex_data/knowledgebases/wikipedia_score_15/enwiki_20180420_100d.pkl" ]; \
 	then \
