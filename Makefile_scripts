@@ -1,0 +1,116 @@
+help:
+	@echo ""
+	@echo "Available make commands are:"
+	@echo " help              : prints this message"
+	@echo "                        (requires 20 MB of RAM and takes 0.05 sec)"
+	@echo " setup             : verifies that necessary files are present,"
+	@echo "                        and runs the scripts to generate missing files"
+	@echo "                        (requires up to 12 GB RAM and may take many minutes)"
+	@echo " data-generation   : runs the python script 'generate_input_data.py',"
+	@echo "                        reading file paths from config.ini"
+	@echo "                        (requires 0.5 GB RAM and takes 30 sec)"
+	@echo " train             : trains a new model"
+	@echo "                        (requires 9 GB RAM and a GPU,"
+	@echo "                         and takes 1.5 minutes per training epoch)"
+	@echo " evaluate-test     : evaluate latest model on AIDA-CoNLL test dataset;"
+	@echo "                        (requires 9 GB and takes 1.5 min"
+	@echo " evaluate-val      : evaluate latest model on AIDA-CoNLL validation dataset;"
+	@echo "                        (requires 9 GB and takes 1.5 min"
+	@echo " full              : runs main script for full pipeline, to train a NEW model"
+	@echo "                        (requires 9 GB RAM and a GPU for training)"
+	@echo " unittest          : runs the python unittests "
+	@echo "                        (requires 9 GB RAM and takes 4 minutes)"
+	@echo "Various scripts for deeper analysis:"
+	@echo " compare-datasets  : runs script to compare entities in AIDA-CoNLL to "
+	@echo "                        entities in the Wikipedia Articles 50K dataset"
+	@echo "                        (statistics for section 5.2.2 in thesis)"
+	@echo "                        (requires 0.8 GB RAM and takes 30 sec)"
+	@echo " evaluate-kb       : runs script to evaluate Knowledge Bases on AIDA-CoNLL"
+	@echo "                        (statistics for 5.3.1 in thesis)"
+	@echo "                        (requires 0.5 GB RAM and takes 30 sec)"
+	@echo " evaluate-cg       : runs script to evaluate the Candidate Generation module"
+	@echo "                        (statistics for 5.3.2 in thesis)"
+	@echo "                        (requires 9 GB RAM and takes 1.5 min)"
+	@echo " evaluate-unseen   : runs script to evaluate model performance on seen/unseen"
+	@echo "                        entities in the Wikipedia Articles Dataset"
+	@echo "                        (for 6.2.1 in thesis)"
+	@echo "                        (requires 0.7 GB RAM and takes 30 sec)"
+	@echo " popularity-corr   : runs script to calculate the correlation between entity"
+	@echo "                        frequency in AIDA-CoNLL Train and popularity in Wikipedia"
+	@echo "                        (for 6.2.1 in thesis)"
+	@echo "                        (requires 6 GB RAM and takes 1.5 min)"
+	@echo " evaluate-by-cat   : runs script to evaluate the results of a model on "
+	@echo "                        categories of entities."
+	@echo "                        (for 6.2.2 in thesis)"
+	@echo "                        (requires 12 GB RAM and takes 7 min)"
+	@echo ""
+
+setup:
+	@if [ -f "/ex_data/entity_dict.json" ] && [ -f "/ex_data/alias_dict.json" ]; \
+	then \
+	echo " Found alias_dict.json and entity_dict.json"; \
+	else \
+	echo " Generating alias_dict.json and entity_dict.json"; \
+	python3 -m scripts.generate_dicts_from_pem_file; \
+	fi; \
+	if [ -f "/ex_data/annotated_datasets/conll-wikipedia-iob-annotations" ]; \
+	then \
+	echo " Found conll-wikipedia-iob-annotations"; \
+	else \
+	echo " Generating Wikipedia annotated AIDA-CoNLL dataset"; \
+	python3 -m scripts.generate_conll_wikipedia_annotations; \
+	fi; \
+	if [ -d "/ex_data/knowledgebases/wikipedia_score_15" ] && [ -f "/ex_data/knowledgebases/wikipedia_score_15/enwiki_20180420_100d.pkl" ]; \
+	then \
+	echo " Found compact Wikipedia KB at /ex_data/knowledgebases/wikipedia_score_15"; \
+	else \
+	echo " Generating compact Wikipedia KB with threshold 15 and all AIDA-CoNLL entities"; \
+	python -m scripts.compact_kb --min_score 15 --add_conll_entities /ex_data/knowledgebases/wikipedia_score_15; \
+	fi; \
+	echo " Setup done!"
+
+data-generation:
+	python3 generate_input_data.py
+
+train:
+	python3 train_model.py -n
+
+evaluate-test:
+	python3 evaluate_model.py -d test -c --no_eval_unseen "$(shell ls -td "$(shell ls -td /models/trained/* | head -n 1)"/* | head -n 1)"
+
+evaluate-val:
+	python3 evaluate_model.py -d val -c --no_eval_unseen "$(shell ls -td "$(shell ls -td /models/trained/* | head -n 1)"/* | head -n 1)"
+
+unittest:
+	python3 -m unittest discover
+
+full: setup data-generation unittest train evaluate-test
+
+compare-datasets:
+	python3 -m scripts.compare_dataset_entities
+
+evaluate-cg:
+	python3 -m scripts.evaluate_cg --kb_type pedia
+
+evaluate-kb:
+	python3 -m scripts.evaluate_kb --kb_type pedia
+	python3 -m scripts.evaluate_kb --kb_type pedia --compact_kb
+
+evaluate-by-cat:
+	echo "  Evaluating BASE model Without CG"
+	python3 -m scripts.evaluate_mention_categories --jsonl_file /models/trained/20211129_1004/saved_20211129_1705/predictions/conll_test_no_cs_oo_kb_predictions.jsonl
+	echo "  Evaluating PRETRAINED model Without CG"
+	python3 -m scripts.evaluate_mention_categories --jsonl_file /models/trained/20211129_1040/saved_20211129_1744/predictions/conll_test_no_cs_oo_kb_predictions.jsonl
+	echo "  Evaluating BASE model With CG"
+	python3 -m scripts.evaluate_mention_categories --jsonl_file /models/trained/20211129_1004/saved_20211129_1705/predictions/conll_test_cs_oo_kb_predictions.jsonl
+	echo "  Evaluating PRETRAINED model With CG"
+	python3 -m scripts.evaluate_mention_categories --jsonl_file /models/trained/20211129_1040/saved_20211129_1744/predictions/conll_test_cs_oo_kb_predictions.jsonl
+
+evaluate-unseen:
+	echo " Model pretrained on 50K Wikipedia Articles"
+	python3 -m scripts.evaluate_seen_unseen /models/trained/20211129_1040/saved_20211129_1744/predictions/conll_test_cs_in_kb_predictions.tsv /models/trained/20211129_1040/saved_20211129_1744/predictions/conll_test_cs_in_kb_ground_truth.tsv --wiki_file /ex_data/annotated_datasets/train_articles_dataset_score_0_50k.txt --conll_file /ex_data/annotated_datasets/conll-wikipedia-iob-annotations
+	echo " Not pretrained model"
+	python3 -m scripts.evaluate_seen_unseen /models/trained/20211129_1004/saved_20211129_1705/predictions/conll_test_cs_in_kb_predictions.tsv /models/trained/20211129_1004/saved_20211129_1705/predictions/conll_test_cs_in_kb_ground_truth.tsv --wiki_file /ex_data/annotated_datasets/train_articles_dataset_score_0_50k.txt --conll_file /ex_data/annotated_datasets/conll-wikipedia-iob-annotations
+
+popularity-corr:
+	python3 -m scripts.popularity_correlation
