@@ -11,11 +11,19 @@ Run as module:
 """
 import argparse
 import json
-from src.toolbox import get_docs
+import os.path
+from configparser import ConfigParser
 from wikipedia2vec import Wikipedia2Vec
 from urllib.parse import unquote
 from unidecode import unidecode
+from src.toolbox import get_docs
 
+
+config = ConfigParser()
+config.read('config.ini')
+w2v_dir = config['KNOWLEDGE BASE']['Wikipedia2vec Directory']
+w2v_file = config['KNOWLEDGE BASE']['Wikipedia2vec File']
+w2v_path = os.path.join(w2v_dir, w2v_file)
 
 parser = argparse.ArgumentParser(
             formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -23,7 +31,7 @@ parser = argparse.ArgumentParser(
         )
 parser.add_argument(
         "--wikipedia2vec", type=str,
-        default='/ex_data/enwiki_20180420_100d.pkl',
+        default=w2v_path,
         help="path to Wikipedia2vec .pkl file"
     )
 parser.add_argument(
