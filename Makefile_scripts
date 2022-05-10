@@ -5,17 +5,25 @@ help:
 	@echo "                        (requires 20 MB of RAM and takes 0.05 sec)"
 	@echo " setup             : verifies that necessary files are present,"
 	@echo "                        and runs the scripts to generate missing files"
-	@echo "                        (requires up to 12 GB RAM and may take many minutes)"
+	@echo "                        (requires up to 12 GB RAM and may take 15 minutes)"
 	@echo " data-generation   : runs the python script 'generate_input_data.py',"
 	@echo "                        reading file paths from config.ini"
 	@echo "                        (requires 0.5 GB RAM and takes 30 sec)"
 	@echo " train             : trains a new model"
 	@echo "                        (requires 9 GB RAM and a GPU,"
 	@echo "                         and takes 1.5 minutes per training epoch)"
-	@echo " evaluate-test     : evaluate latest model on AIDA-CoNLL test dataset;"
-	@echo "                        (requires 9 GB and takes 1.5 min"
-	@echo " evaluate-val      : evaluate latest model on AIDA-CoNLL validation dataset;"
-	@echo "                        (requires 9 GB and takes 1.5 min"
+	@echo " eval-test-nocg    : evaluate latest model on AIDA-CoNLL test dataset"
+	@echo "                        without candidate generation"
+	@echo "                        (requires 9 GB and takes 3 min)"
+	@echo " eval-test     : evaluate latest model on AIDA-CoNLL test dataset"
+	@echo "                        with candidate generation"
+	@echo "                        (requires 9 GB and takes 3 min)"
+	@echo " eval-val-nocg     : evaluate latest model on AIDA-CoNLL validation dataset"
+	@echo "                        without candidate generation"
+	@echo "                        (requires 9 GB and takes 3 min)"
+	@echo " eval-val      : evaluate latest model on AIDA-CoNLL validation dataset"
+	@echo "                        with candidate generation"
+	@echo "                        (requires 9 GB and takes 3 min)"
 	@echo " full              : runs main script for full pipeline, to train a NEW model"
 	@echo "                        (requires 9 GB RAM and a GPU for training)"
 	@echo " unittest          : runs the python unittests "
@@ -75,11 +83,17 @@ data-generation:
 train:
 	python3 train_model.py -n
 
-evaluate-test:
+eval-test:
 	python3 evaluate_model.py -d test -c --no_eval_unseen "$(shell ls -td "$(shell ls -td /models/trained/* | head -n 1)"/* | head -n 1)"
 
-evaluate-val:
+eval-test-nocg:
+	python3 evaluate_model.py -d test --no_eval_unseen "$(shell ls -td "$(shell ls -td /models/trained/* | head -n 1)"/* | head -n 1)"
+
+eval-val:
 	python3 evaluate_model.py -d val -c --no_eval_unseen "$(shell ls -td "$(shell ls -td /models/trained/* | head -n 1)"/* | head -n 1)"
+
+eval-val-nocg:
+	python3 evaluate_model.py -d val --no_eval_unseen "$(shell ls -td "$(shell ls -td /models/trained/* | head -n 1)"/* | head -n 1)"
 
 unittest:
 	python3 -m unittest discover

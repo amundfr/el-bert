@@ -117,30 +117,6 @@ if __name__ == '__main__':
     print("\n 5. Loading knowledgebase for evaluation")
     kb = get_knowledge_base(config, wiki='pedia', with_cg=True)
 
-    # kb_dir = config['KNOWLEDGE BASE']['Wikipedia2vec Directory']
-    # w2vec_file = path.join(kb_dir, config['KNOWLEDGE BASE']['Wikipedia2Vec File'])
-
-    # alias_dict_file = ''
-    # entity_dict_file = ''
-    # p_e_m_file = ''
-    # if config.has_option('KNOWLEDGE BASE', 'Alias Dict') \
-    #         and config.has_option('KNOWLEDGE BASE', 'Entity Dict'):
-    #     alias_dict_file = config['KNOWLEDGE BASE']['Alias Dict']
-    #     entity_dict_file = config['KNOWLEDGE BASE']['Entity Dict']
-    # else:
-    #     p_e_m_file = config['KNOWLEDGE BASE']['Alias Mapping']
-
-    # kb = KnowledgeBaseWikipedia(
-    #         w2vec_file,
-    #         alias_dict_file=alias_dict_file,
-    #         entity_dict_file=entity_dict_file,
-    #         p_e_m_file=p_e_m_file,
-    #     )
-
-    # # print("\n 5a. Loading Alias Mapping for "
-    # #       "candidate generation during evaluation")
-    # # kb.init_alias_mapping(config['KNOWLEDGE BASE']['Alias Mapping'])
-
     print("\n 6. Starting training")
     early_stopping = config.getboolean('TRAINING', 'Early Stopping')
     train_update_freq = config.getint('VERBOSITY', 'Training Update Frequency')
