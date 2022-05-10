@@ -112,19 +112,19 @@ evaluate-kb:
 
 evaluate-by-cat:
 	echo "  Evaluating BASE model Without CG"
-	python3 -m scripts.evaluate_mention_categories --jsonl_file /models/trained/20211129_1004/saved_20211129_1705/predictions/conll_test_no_cs_oo_kb_predictions.jsonl
+	python3 -m scripts.evaluate_mention_categories --jsonl_file /models/trained/5_4_3-table_11-base_model/epoch_180/predictions/conll_test_no_cs_oo_kb_predictions.jsonl
 	echo "  Evaluating PRETRAINED model Without CG"
-	python3 -m scripts.evaluate_mention_categories --jsonl_file /models/trained/20211129_1040/saved_20211129_1744/predictions/conll_test_no_cs_oo_kb_predictions.jsonl
+	python3 -m scripts.evaluate_mention_categories --jsonl_file /models/trained/5_4_3-table_11-pretrained_model/epoch_180/predictions/conll_test_no_cs_oo_kb_predictions.jsonl
 	echo "  Evaluating BASE model With CG"
-	python3 -m scripts.evaluate_mention_categories --jsonl_file /models/trained/20211129_1004/saved_20211129_1705/predictions/conll_test_cs_oo_kb_predictions.jsonl
+	python3 -m scripts.evaluate_mention_categories --jsonl_file /models/trained/5_4_3-table_11-base_model/epoch_180/predictions/conll_test_cs_oo_kb_predictions.jsonl
 	echo "  Evaluating PRETRAINED model With CG"
-	python3 -m scripts.evaluate_mention_categories --jsonl_file /models/trained/20211129_1040/saved_20211129_1744/predictions/conll_test_cs_oo_kb_predictions.jsonl
+	python3 -m scripts.evaluate_mention_categories --jsonl_file /models/trained/5_4_3-table_11-pretrained_model/epoch_180/predictions/conll_test_cs_oo_kb_predictions.jsonl
 
 evaluate-unseen:
 	echo " Model pretrained on 50K Wikipedia Articles"
-	python3 -m scripts.evaluate_seen_unseen /models/trained/20211129_1040/saved_20211129_1744/predictions/conll_test_cs_in_kb_predictions.tsv /models/trained/20211129_1040/saved_20211129_1744/predictions/conll_test_cs_in_kb_ground_truth.tsv --wiki_file /ex_data/annotated_datasets/train_articles_dataset_score_0_50k.txt --conll_file /ex_data/annotated_datasets/conll-wikipedia-iob-annotations
+	python3 -m scripts.evaluate_seen_unseen /models/trained/5_4_3-table_11-pretrained_model/epoch_180/predictions/conll_test_cs_in_kb_predictions.tsv /models/trained/20211129_1040/saved_20211129_1744/predictions/conll_test_cs_in_kb_ground_truth.tsv --wiki_file /ex_data/annotated_datasets/train_articles_dataset_score_0_50k.txt --conll_file /ex_data/annotated_datasets/conll-wikipedia-iob-annotations
 	echo " Not pretrained model"
-	python3 -m scripts.evaluate_seen_unseen /models/trained/20211129_1004/saved_20211129_1705/predictions/conll_test_cs_in_kb_predictions.tsv /models/trained/20211129_1004/saved_20211129_1705/predictions/conll_test_cs_in_kb_ground_truth.tsv --wiki_file /ex_data/annotated_datasets/train_articles_dataset_score_0_50k.txt --conll_file /ex_data/annotated_datasets/conll-wikipedia-iob-annotations
+	python3 -m scripts.evaluate_seen_unseen /models/trained/5_4_3-table_11-base_model/epoch_180/predictions/conll_test_cs_in_kb_predictions.tsv /models/trained/20211129_1004/saved_20211129_1705/predictions/conll_test_cs_in_kb_ground_truth.tsv --wiki_file /ex_data/annotated_datasets/train_articles_dataset_score_0_50k.txt --conll_file /ex_data/annotated_datasets/conll-wikipedia-iob-annotations
 
 popularity-corr:
 	python3 -m scripts.popularity_correlation
