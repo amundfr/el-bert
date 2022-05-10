@@ -86,10 +86,28 @@ make eval-test-nocg
 make eval-val-nocg
 ```
 
+### Evaluate Main Models
+
+To evaluate the most important models in the thesis, run the following commands (assuming you have access to the models). 
+
+Removing the flag '-c' will evaluate without Candidate Generation.
+
+ * The base model (best performing without pretraining):
+```bash
+python3 evaluate_model.py -c -d test --no_eval_unseen "/models/trained/5_4_3-table_11-base_model/epoch_180"
+```
+ * The pretrained model:
+```bash
+python3 evaluate_model.py -c -d test --no_eval_unseen "/models/trained/5_4_3-table_11-pretrained_model/epoch_180"
+```
+ * Our version of the model of Chen et al.:
+```bash
+python3 evaluate_model.py -c -d test --no_eval_unseen "/models/trained/6_1_1-table_12-our_chen/epoch_180"
+```
 
 ### Additional Evaluation
 
-There are a number of evaluation scripts used to harvest statistics for the thesis. These can be accessed with `make` aswell.
+There are a number of evaluation scripts used to harvest statistics for the thesis. These can be accessed with `make` as well.
 
 For Section 5.2.2 in thesis:
 ```bash

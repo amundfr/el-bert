@@ -57,7 +57,6 @@ if __name__ == '__main__':
                 "--print_docs", action='store_true', default=False,
                 help="flag: if provided, results on all documents are printed"
             )
-    # TODO: Make default=False below
     parser.add_argument(
                 "--no_eval_unseen", action='store_false', default=True,
                 help="flag: if provided, do not evaluate "
